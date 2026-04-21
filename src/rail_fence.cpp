@@ -90,3 +90,28 @@ int main() {
     int rails;
 
     if (choice == 3) {
+        message = read_message_from_file("data/input.txt");
+        cout << "Message from file: " << message << "\n";
+    } else {
+        cout << "Enter message: ";
+        getline(cin, message);
+    }
+
+    cout << "Enter rails: ";
+    cin >> rails;
+
+    if (!is_valid_message(message)) {
+        cout << "Invalid input. Only letters and spaces are allowed.\n";
+        return 0;
+    }
+
+    if (choice == 1 || choice == 3) {
+        cout << "Ciphertext: " << rail_fence_encrypt(message, rails) << "\n";
+    } else if (choice == 2) {
+        cout << "Plaintext: " << rail_fence_decrypt(message, rails) << "\n";
+    } else {
+        cout << "Invalid choice.\n";
+    }
+
+    return 0;
+}
