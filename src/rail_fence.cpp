@@ -1,4 +1,4 @@
-#include <cctype>
+﻿#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -23,7 +23,6 @@ string rail_fence_encrypt(const string &plaintext, int rails) {
     int direction = 1;
 
     for (char c : plaintext) {
-        // TODO(student): Q6 can keep spaces as normal characters.
         fence[rail] += c;
         rail += direction;
         if (rail == rails - 1 || rail == 0) direction = -direction;
@@ -35,8 +34,41 @@ string rail_fence_encrypt(const string &plaintext, int rails) {
 }
 
 string rail_fence_decrypt(const string &ciphertext, int rails) {
-    // TODO(student): Q5
-    return ciphertext;
+    if (rails <= 1 || ciphertext.empty()) return ciphertext;
+
+    // Bước 1: Tạo ma trận đánh dấu vị trí zigzag
+    vector<vector<bool>> mark(rails, vector<bool>(ciphertext.length(), false));
+    int row = 0;
+    int direction = 1;
+
+    for (size_t i = 0; i < ciphertext.length(); i++) {
+        mark[row][i] = true;
+        row += direction;
+        if (row == rails - 1 || row == 0) direction = -direction;
+    }
+
+    // Bước 2: Điền ký tự từ ciphertext vào các vị trí đã đánh dấu
+    vector<string> fence(rails, string(ciphertext.length(), ' '));
+    size_t idx = 0;
+    for (int r = 0; r < rails; r++) {
+        for (size_t c = 0; c < ciphertext.length(); c++) {
+            if (mark[r][c] && idx < ciphertext.length()) {
+                fence[r][c] = ciphertext[idx++];
+            }
+        }
+    }
+
+    // Bước 3: Đọc theo đường zigzag để lấy plaintext
+    string plaintext;
+    row = 0;
+    direction = 1;
+    for (size_t i = 0; i < ciphertext.length(); i++) {
+        plaintext += fence[row][i];
+        row += direction;
+        if (row == rails - 1 || row == 0) direction = -direction;
+    }
+    
+    return plaintext;
 }
 
 string read_message_from_file(const string &path) {
@@ -59,27 +91,4 @@ int main() {
 
     if (choice == 3) {
         message = read_message_from_file("data/input.txt");
-        cout << "Message from file: " << message << "\n";
-    } else {
-        cout << "Enter message: ";
-        getline(cin, message);
-    }
-
-    cout << "Enter rails: ";
-    cin >> rails;
-
-    if (!is_valid_message(message)) {
-        cout << "Invalid input. Only letters and spaces are allowed.\n";
-        return 0;
-    }
-
-    if (choice == 1 || choice == 3) {
-        cout << "Ciphertext: " << rail_fence_encrypt(message, rails) << "\n";
-    } else if (choice == 2) {
-        cout << "Plaintext: " << rail_fence_decrypt(message, rails) << "\n";
-    } else {
-        cout << "Invalid choice.\n";
-    }
-
-    return 0;
-}
+        cout << "Message from file: "
