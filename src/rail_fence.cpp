@@ -90,5 +90,3 @@ int main() {
     int rails;
 
     if (choice == 3) {
-        message = read_message_from_file("data/input.txt");
-        cout << "Message from file: "
